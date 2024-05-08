@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { catchError } from 'rxjs/operators';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpResponse  } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 //Declaring the api url that will provide data for the client app
 
@@ -10,7 +9,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class UserRegistrationService {
-  private baseUrl = 'https://letflixnow.netlify.app';
+  private baseUrl = 'https://letflixnow.netlify.app/';
  /**
    * @constructor
    * @param {HttpClient} http - For making HTTP requests.
@@ -18,14 +17,13 @@ export class UserRegistrationService {
   constructor(private http: HttpClient) {
   }
 
-
    /**
    * Making the api call for the user registration endpoint
    * @param userDetails 
    * @returns an observable with the user
    */
    public userRegistration(userDetails: any): Observable<any> {
-    return this.http.post(apiUrl + 'users', userDetails).pipe(
+    return this.http.post<any>(`${this.baseUrl}users`, userDetails, {}).pipe(
       catchError(this.handleError)
     );
   }
@@ -36,7 +34,7 @@ export class UserRegistrationService {
    * @returns an observable with the user
    */
    public userLogin(userDetails: any): Observable<any> {
-    return this.http.post(apiUrl + 'login?' + new URLSearchParams(userDetails), {}).pipe(
+    return this.http.post<any>(`${this.baseUrl}login`, userDetails, {}).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
     );
@@ -48,13 +46,17 @@ export class UserRegistrationService {
    */
   getAllMovies(): Observable<any> {
     const token = localStorage.getItem('token');
-    return this.http.get(apiUrl + 'movies', {headers: new HttpHeaders(
-      {
-        Authorization: 'Bearer ' + token,
+    return this.http.get<any>(`${this.baseUrl}movies`, { headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`
       })}).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
     );
+  }
+  // Non-typed response extraction
+  private extractResponseData(res: Response): any {
+    const body = res;
+    return body || { };
   }
 
   /**
@@ -80,8 +82,8 @@ export class UserRegistrationService {
  * @returns {Observable<any>} - Observable for the API response.
  */
 getDirector(name: string): Observable<any> {
-  const encodedName = encodeURIComponent(name); // Properly encode the director's name
-  return this.http.get(`${this.baseUrl}/directors/${encodedName}`).pipe(
+  const encodedName = encodeURIComponent(name);
+  return this.http.get<any>(`${this.baseUrl}directors/${encodedName}`).pipe(
     map(this.extractResponseData),
     catchError(this.handleError)
   );
@@ -93,13 +95,9 @@ getDirector(name: string): Observable<any> {
    * @returns {Observable<any>} - Observable for the API response.
    */
 getGenreByName(genreName: string): Observable<any> {
-  const encodedGenreName = encodeURIComponent(genreName); // Properly encode the genre name
-  return this.http.get(`${this.baseUrl}/movies/genres/${encodedGenreName}`, {
-    headers: new HttpHeaders({
-      'Authorization': `Bearer ${this.authService.getToken()}` // Assuming you have a service to handle JWT
-    })
-  }).pipe(
-    map(response => response), // Optionally process the response
+  const encodedGenreName = encodeURIComponent(genreName);
+  return this.http.get<any>(`${this.baseUrl}movies/genres/${encodedGenreName}`).pipe(
+    map(this.extractResponseData),
     catchError(this.handleError)
   );
 }
@@ -110,19 +108,14 @@ getGenreByName(genreName: string): Observable<any> {
    * @returns {Observable<any>} Observable for the API response, including user data.
    */
    getUserByUsername(username: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.authService.getToken()}` // Assuming you have a service to handle JWT
-    });
-
-    return this.http.get(`${this.baseUrl}/users/${encodeURIComponent(username)}`, { headers: headers })
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.get<any>(`${this.baseUrl}users/${encodeURIComponent(username)}`).pipe(
+      catchError(this.handleError)
+    );
   }
 
   // Get favourite movies for a user
-  getFavouriteMovies(userId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users/${userId}/favorites`).pipe(
+  getFavouriteMovies(userId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}users/${userId}/favorites`).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
     );
@@ -135,14 +128,9 @@ getGenreByName(genreName: string): Observable<any> {
    * @returns {Observable<any>} Observable for the API response, including updated user data.
    */
   addFavoriteMovie(username: string, movieId: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.authService.getToken()}` // Assuming you have a service to handle JWT
-    });
-
-    return this.http.post(`${this.baseUrl}/users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`, {}, { headers: headers })
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.post<any>(`${this.baseUrl}users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`, {}).pipe(
+      catchError(this.handleError)
+    );
   }
 
 /**
@@ -151,16 +139,10 @@ getGenreByName(genreName: string): Observable<any> {
    * @param userData The user data to update (username, password, email, birthday).
    * @returns {Observable<any>} Observable for the API response.
    */
-updateUser(userId: string, userData: { Username?: string; Password?: string; Email?: string; Birthday?: Date }): Observable<any> {
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${this.authService.getToken()}` 
-  });
-
-  return this.http.put(`${this.baseUrl}/users/${userId}`, userData, { headers: headers })
-    .pipe(
-      catchError(this.handleError)
-    );
+updateUser(userId: string, userData: any): Observable<any> {
+  return this.http.put<any>(`${this.baseUrl}users/${userId}`, userData).pipe(
+    catchError(this.handleError)
+  );
 }
 
  /**
@@ -169,14 +151,9 @@ updateUser(userId: string, userData: { Username?: string; Password?: string; Ema
    * @returns {Observable<any>} Observable for the API response.
    */
  deleteUser(userId: string): Observable<any> {
-  const headers = new HttpHeaders({
-    'Authorization': `Bearer ${this.authService.getToken()}` // Assuming you have a service to handle JWT
-  });
-
-  return this.http.delete(`${this.baseUrl}/users/${userId}`, { headers: headers })
-    .pipe(
-      catchError(this.handleError)
-    );
+  return this.http.delete<any>(`${this.baseUrl}users/${userId}`).pipe(
+    catchError(this.handleError)
+  );
 }
 
 /**
@@ -186,25 +163,19 @@ updateUser(userId: string, userData: { Username?: string; Password?: string; Ema
    * @returns {Observable<any>} Observable for the API response, including status message and updated user data.
    */
 removeFavoriteMovie(username: string, movieId: string): Observable<any> {
-  const headers = new HttpHeaders({
-    'Authorization': `Bearer ${this.authService.getToken()}` // Assuming you have a service to handle JWT
-  });
-
-  return this.http.delete(`${this.baseUrl}/users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`, { headers: headers })
-    .pipe(
-      catchError(this.handleError)
-    );
+  return this.http.delete<any>(`${this.baseUrl}users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`).pipe(
+    catchError(this.handleError)
+  );
 }
 
 private handleError(error: HttpErrorResponse): any {
-    if (error.error instanceof ErrorEvent) {
-    console.error('Some error occurred:', error.error.message);
-    } else {
+  if (error.error instanceof ErrorEvent) {
+    console.error('An error occurred:', error.error.message);
+  } else {
     console.error(
-        `Error Status code ${error.status}, ` +
-        `Error body is: ${error.error}`);
-    }
-    return throwError(
-    'Something bad happened; please try again later.');
+      `Backend returned code ${error.status}, body was: ${error.error}`);
   }
+  return throwError(
+    'Something bad happened; please try again later.');
+}
 }
