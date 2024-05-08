@@ -68,7 +68,7 @@ export class UserRegistrationService {
     const encodedTitle = encodeURIComponent(title);
     return this.http.get(`${this.baseUrl}/movies/${encodedTitle}`).pipe(
       map(response => {
-        // Optional: process the response if needed
+       
         return response;
       }),
       catchError(this.handleError)
@@ -114,8 +114,8 @@ getGenreByName(genreName: string): Observable<any> {
   }
 
   // Get favourite movies for a user
-  getFavouriteMovies(userId: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}users/${userId}/favorites`).pipe(
+  getFavouriteMovies(username: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}users/${username}/favorites`).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
     );
