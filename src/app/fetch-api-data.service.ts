@@ -8,7 +8,7 @@ import { Observable, throwError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class UserRegistrationService {
+export class FetchApiDataService {
   private baseUrl = 'https://letflixnow.netlify.app/';
  /**
    * @constructor
