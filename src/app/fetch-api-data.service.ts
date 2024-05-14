@@ -3,13 +3,14 @@ import { catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 
-//Declaring the api url that will provide data for the client app
 
 @Injectable({
   providedIn: 'root'
 })
+/** API URL that will provide data for the client app */
 export class FetchApiDataService {
-  private baseUrl = 'https://letflixnow.netlify.app/';
+  private apiUrl = 'https://your-api-url.netlify.app';
+
  /**
    * @constructor
    * @param {HttpClient} http - For making HTTP requests.
@@ -23,7 +24,7 @@ export class FetchApiDataService {
    * @returns an observable with the user
    */
    public userRegistration(userDetails: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}users`, userDetails, {}).pipe(
+    return this.http.post<any>(`${this.apiUrl}users`, userDetails, {}).pipe(
       catchError(this.handleError)
     );
   }
@@ -34,7 +35,7 @@ export class FetchApiDataService {
    * @returns an observable with the user
    */
    public userLogin(userDetails: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}login`, userDetails, {}).pipe(
+    return this.http.post<any>(`${this.apiUrl}login`, userDetails, {}).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
     );
@@ -46,7 +47,7 @@ export class FetchApiDataService {
    */
   getAllMovies(): Observable<any> {
     const token = localStorage.getItem('token');
-    return this.http.get<any>(`${this.baseUrl}movies`, { headers: new HttpHeaders({
+    return this.http.get<any>(`${this.apiUrl}movies`, { headers: new HttpHeaders({
         'Authorization': `Bearer ${token}`
       })}).pipe(
       map(this.extractResponseData),
@@ -66,7 +67,7 @@ export class FetchApiDataService {
    */
   getMovieByTitle(title: string): Observable<any> {
     const encodedTitle = encodeURIComponent(title);
-    return this.http.get(`${this.baseUrl}/movies/${encodedTitle}`).pipe(
+    return this.http.get(`${this.apiUrl}/movies/${encodedTitle}`).pipe(
       map(response => {
        
         return response;
@@ -83,7 +84,7 @@ export class FetchApiDataService {
  */
 getDirector(name: string): Observable<any> {
   const encodedName = encodeURIComponent(name);
-  return this.http.get<any>(`${this.baseUrl}directors/${encodedName}`).pipe(
+  return this.http.get<any>(`${this.apiUrl}directors/${encodedName}`).pipe(
     map(this.extractResponseData),
     catchError(this.handleError)
   );
@@ -96,7 +97,7 @@ getDirector(name: string): Observable<any> {
    */
 getGenreByName(genreName: string): Observable<any> {
   const encodedGenreName = encodeURIComponent(genreName);
-  return this.http.get<any>(`${this.baseUrl}movies/genres/${encodedGenreName}`).pipe(
+  return this.http.get<any>(`${this.apiUrl}movies/genres/${encodedGenreName}`).pipe(
     map(this.extractResponseData),
     catchError(this.handleError)
   );
@@ -108,14 +109,14 @@ getGenreByName(genreName: string): Observable<any> {
    * @returns {Observable<any>} Observable for the API response, including user data.
    */
    getUserByUsername(username: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}users/${encodeURIComponent(username)}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}users/${encodeURIComponent(username)}`).pipe(
       catchError(this.handleError)
     );
   }
 
   // Get favourite movies for a user
   getFavouriteMovies(username: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}users/${username}/favorites`).pipe(
+    return this.http.get<any>(`${this.apiUrl}users/${username}/favorites`).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
     );
@@ -128,7 +129,7 @@ getGenreByName(genreName: string): Observable<any> {
    * @returns {Observable<any>} Observable for the API response, including updated user data.
    */
   addFavoriteMovie(username: string, movieId: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`, {}).pipe(
+    return this.http.post<any>(`${this.apiUrl}users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`, {}).pipe(
       catchError(this.handleError)
     );
   }
@@ -140,7 +141,7 @@ getGenreByName(genreName: string): Observable<any> {
    * @returns {Observable<any>} Observable for the API response.
    */
 updateUser(userId: string, userData: any): Observable<any> {
-  return this.http.put<any>(`${this.baseUrl}users/${userId}`, userData).pipe(
+  return this.http.put<any>(`${this.apiUrl}users/${userId}`, userData).pipe(
     catchError(this.handleError)
   );
 }
@@ -151,7 +152,7 @@ updateUser(userId: string, userData: any): Observable<any> {
    * @returns {Observable<any>} Observable for the API response.
    */
  deleteUser(userId: string): Observable<any> {
-  return this.http.delete<any>(`${this.baseUrl}users/${userId}`).pipe(
+  return this.http.delete<any>(`${this.apiUrl}users/${userId}`).pipe(
     catchError(this.handleError)
   );
 }
@@ -163,7 +164,7 @@ updateUser(userId: string, userData: any): Observable<any> {
    * @returns {Observable<any>} Observable for the API response, including status message and updated user data.
    */
 removeFavoriteMovie(username: string, movieId: string): Observable<any> {
-  return this.http.delete<any>(`${this.baseUrl}users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`).pipe(
+  return this.http.delete<any>(`${this.apiUrl}users/${encodeURIComponent(username)}/movies/${encodeURIComponent(movieId)}`).pipe(
     catchError(this.handleError)
   );
 }
