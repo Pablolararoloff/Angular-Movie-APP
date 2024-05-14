@@ -9,7 +9,7 @@ import { Observable, throwError } from 'rxjs';
 })
 /** API URL that will provide data for the client app */
 export class FetchApiDataService {
-  private apiUrl = 'https://your-api-url.netlify.app';
+  private apiUrl = 'https://letflixnow.netlify.app/';
 
  /**
    * @constructor

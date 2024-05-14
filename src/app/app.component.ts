@@ -9,7 +9,7 @@ import { UserLoginFormComponent } from './user-login-form/user-login-form.compon
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'MYFLIX-ANGULAR-CLIENT';
+  title = 'MYFLIX-ANGULAR-CLIENT...';
 
   constructor(public dialog: MatDialog) { }
 
