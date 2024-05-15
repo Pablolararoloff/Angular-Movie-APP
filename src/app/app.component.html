@@ -1,5 +1,9 @@
 <div>
   <h1>{{ title }}</h1>
-  <button mat-button (click)="openUserRegistrationDialog()">Register</button>
-  <button mat-button (click)="openUserLoginDialog()">Login</button>
+  <button mat-raised-button color="primary" (click)="openUserRegistrationDialog()">Register</button>
+  <button mat-raised-button color="primary" (click)="openUserLoginDialog()">Login</button>
+  <button mat-raised-button color="primary" (click)="openMoviesDialog()">
+    All Movies
+  </button>
 </div>
+<router-outlet></router-outlet>

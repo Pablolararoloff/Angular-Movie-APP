@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { FetchApiDataService } from '../fetch-api-data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+
 @Component({
   selector: 'app-user-registration-form',
   templateUrl: './user-registration-form.component.html',
@@ -21,12 +22,11 @@ export class UserRegistrationFormComponent implements OnInit {
   registerUser(): void {
     this.fetchApiData.userRegistration(this.userData).subscribe((result) => {
       this.dialogRef.close();
-      console.log(result);
-      this.snackBar.open(result, 'OK', {
+      this.snackBar.open('Registration successful', 'OK', {
         duration: 2000
       });
-    }, (result) => {
-      this.snackBar.open(result, 'OK', {
+    }, (error) => {
+      this.snackBar.open(error, 'OK', {
         duration: 2000
       });
     });
